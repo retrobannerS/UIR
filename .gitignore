@@ -1,0 +1,10 @@
+.DS_Store
+*.pages
+
+out/
+.latex_tmp_files/
+
+*local.tex
+*local.pdf
+
+LaTeX/
