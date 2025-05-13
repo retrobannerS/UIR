@@ -1,0 +1,49 @@
+\pagestyle{empty}
+\input{2-titles/0-blank-header}
+
+\begin{center}
+  {\Large{\textbf{Задание на \theprojecttypeshort}}}\\
+
+  \large
+
+  Студенту гр. \theauthorgroup{} \theauthorfulldative
+\end{center}
+
+\begin{center}
+  \uppercase{\textbf{\large{}Тема \theprojecttypeshort}}\\
+
+  {\Large\thetitle}\\
+
+  \vskip 1em
+
+  \uppercase{\textbf{\large{}Задание}}
+\end{center}
+
+{\linespread{1.0}
+\footnotesize
+\noindent
+\begin{longtable}{|p{.5cm}|p{230pt}|>{\scriptsize\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|} \hline
+  \multicolumn{1}{|>{\centering\arraybackslash}p{0.5cm}|}{№\par п/п}
+   & \multicolumn{1}{c|}{Содержание работы}
+   & {\footnotesize Форма отчетности}
+   & Срок исполнения
+   & Отметка о выполнении\par {\scriptsize Дата, подпись} \\\hline
+  \theprojecttasks
+\end{longtable}
+}
+\refsection
+\thetaskliterature
+\begin{center}
+  \uppercase{\textbf{\large{}Литература}}
+\end{center}
+\printbibliography[heading=none]
+\endrefsection
+
+\vfill
+
+{\noindent\linespread{2.0}
+  \begin{tabularx}{\linewidth}{p{140pt}X>{\centering}XX}
+    Дата выдачи задания: & Руководитель & \thesupervisortaskapproval & \thesupervisor \\ \hhline{~~-~}
+    \thetaskdate         & Студент      & \theauthortaskapproval     & \theauthor     \\ \hhline{~~-~}
+  \end{tabularx}
+}
