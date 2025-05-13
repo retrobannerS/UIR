@@ -20,19 +20,14 @@
 {\large
 
   \noindent
-  \begin{tabularx}{\linewidth}{@{}l>{\centering}XlX@{}}
-    Группа              & \raggedright\theauthorgroup &                & \\
-    Студент             & \theauthorrspzapproval      & \theauthor     & \\ \hhline{~-~}
-    Руководитель        & \thesupervisorrspzapproval  & \thesupervisor & \\ \hhline{~-~}
-    Научный консультант & \theconsultantrspzapproval  & \theconsultant & \\ \hhline{~-~}
+  \begin{tabularx}{\linewidth}{@{}l>{\centering}c>{\centering}XlX@{}}
+    Группа              & \raggedright\theauthorgroup &                            &                  \\
+    Студент             &                             & \theauthorrspzapproval     & \theauthor     & \\ \hhline{~~-~}
+    Руководитель        & \thesupervisorrspzgrade     & \thesupervisorrspzapproval & \thesupervisor & \\ \hhline{~~-~}
+    Научный консультант & \theconsultantrspzgrade                          & \theconsultantrspzapproval & \theconsultant & \\ \hhline{~~-~}
   \end{tabularx}
 
   \vfill
-
-  \noindent
-  \begin{tabularx}{\linewidth}{@{}l>{\centering}XX@{}}
-    Оценка руководителя & \thesupervisorrspzgrade & \\ \hhline{~-~}
-  \end{tabularx}
 
   \vfill
 
