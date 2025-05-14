@@ -6,5 +6,6 @@ out/
 
 *local.tex
 *local.pdf
-
 local/
+
+indent.log
