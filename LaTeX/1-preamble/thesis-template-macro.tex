@@ -192,6 +192,19 @@
 \newcommand*{\theconsultantpzgrade}{\@consultantpzgrade}
 \makeatother
 
+%% Настройка подписей
+\makeatletter
+\pgfkeys{
+  /signat/.is family, /signat,
+  xsign/.initial=-10pt,
+  ysign/.initial=4pt,
+  scale/.initial=0.3,
+  img/.initial=supervisor,
+  xdate/.initial=10pt,
+  ydate/.initial=-10pt,
+  date/.initial=01.01.2001
+}
+\makeatother
 
 % Разные подписи для локального и публичного репозиториев
 \IfFileExists{3-content/00-project-members-local}{
@@ -200,10 +213,13 @@
   \newcommand{\sign}[3][0pt]{%
     \tikz[overlay]{\node[yshift=##1]{\includegraphics[scale=##2]{\signaturepath##3.png}}}%
   }
-  \newcommand{\signat}[4][0pt]{%
+  \NewDocumentCommand{\signat}{O{}}{%
+    \pgfkeys{/signat, ##1}%
     \begin{tikzpicture}[overlay]
-      \node[xshift=-10pt,yshift=##1](c){\includegraphics[scale=##2]{\signaturepath##3.png}};
-      \node[xshift=10pt,yshift=-10pt]{\scriptsize\textit{##4}};
+      \node[xshift=\pgfkeysvalueof{/signat/xsign}, yshift=\pgfkeysvalueof{/signat/ysign}](c)
+      {\includegraphics[scale=\pgfkeysvalueof{/signat/scale}]{\signaturepath\pgfkeysvalueof{/signat/img}.png}};
+      \node[xshift=\pgfkeysvalueof{/signat/xdate}, yshift=\pgfkeysvalueof{/signat/ydate}]
+      {\small\textit{\pgfkeysvalueof{/signat/date}}};
     \end{tikzpicture}
   }
 }{
@@ -213,10 +229,13 @@
     % Аргументы игнорируются, фиксированная заглушка
     \tikz[overlay]{\node[yshift=10pt]{\includegraphics[scale=.15]{\signaturepath##3.png}}}%
   }
-  \newcommand{\signat}[4][0pt]{%
+  \NewDocumentCommand{\signat}{O{}}{%
+    \pgfkeys{/signat, ##1}%
     \begin{tikzpicture}[overlay]
-      \node[xshift=-10pt,yshift=4pt](c){\includegraphics[scale=0.12]{\signaturepath##3.png}};
-      \node[xshift=10pt,yshift=-10pt]{\scriptsize\textit{##4}};
+      \node[xshift=-15pt, yshift=7pt](c)
+      {\includegraphics[scale=0.1]{\signaturepath\pgfkeysvalueof{/signat/img}.png}};
+      \node[xshift=15pt, yshift=-2pt]
+      {\small\textit{\pgfkeysvalueof{/signat/date}}};
     \end{tikzpicture}
   }
 }
