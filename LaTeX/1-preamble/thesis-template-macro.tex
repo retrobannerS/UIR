@@ -51,6 +51,7 @@
 \usepackage{pgf}
 \usepackage{1-preamble/pstheorems}
 \usepackage{titling}
+\usepackage{totcount}
 
 % Настройка списков (без лишних вертикальных отступов)
 \usepackage{paralist}
@@ -100,9 +101,8 @@
   \renewcommand{\contentsname}%
   {Содержание}%
 }
-
-%\renewcommand{\appendixname}{Приложение}% Change "chapter name" for Appendix chapters
-%\renewcommand{\cftchapdotsep}{\cftdotsep}
+\newcounter{totalappendices}
+\regtotcounter{totalappendices}
 
 \usepackage{mathpartir}
 
@@ -126,6 +126,10 @@
   autolang=other
 ]{biblatex}
 \addbibresource{5-bibliography/bibliography.bib}
+
+%% Автоматическое добавление количества источников в реферат
+\newtotcounter{citenum}
+\AtEveryBibitem{\stepcounter{citenum}}
 
 \usepackage{tikz}
 \usepackage{hhline}
