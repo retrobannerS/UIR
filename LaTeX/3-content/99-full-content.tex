@@ -54,8 +54,6 @@
 
 \input{3-content/08-conclusion}
 
-\label{end_of_main_text}
-
 \setcounter{totalfigures}{\the\value{totalfigures}+\the\value{figure}}
 \setcounter{figure}{0}
 \setcounter{totaltables}{\the\value{totaltables}+\the\value{table}}
@@ -72,41 +70,67 @@
 \label{listings}
 \makeatother
 
+% --- СЕКЦИЯ БИБЛИОГРАФИИ ---
+
 \clearpage
 
 \input{3-content/09-bibliography}
 
 \endrefsection
 
+\label{end_of_main_text}
+
+%--- КОНЕЦ СЕКЦИИ БИБЛИОГРАФИИ ---
 \clearpage
+\label{sec:appendices}
 
-%\chapter*{Приложения}
-%\addcontentsline{toc}{chapter}{Приложения}
-%\appendixtocon
-%\renewcommand{\appendixname}{Приложение}
-\appendix
-\renewcommand{\appendixtocname}{Приложения}
-\addappheadtotoc
-%\titleformat{\chapter}[block]{\centering\normalfont\Large\bfseries}{\chaptername{} \thechapter.}{1ex}{}{}
-\renewcommand{\chaptername}{Приложение}
-%\renewcommand*\printchaptername{\Large\bfseries\appendixname~}
-%\renewcommand{\thechapter}{Приложение \Alph{chapter}}
-%\renewcommand{\thechaptertoc}{Приложение \Alph{chapter}}
+\begin{appendices}
+    \chapter*{Приложения}
+    \addcontentsline{toc}{chapter}{Приложения}
 
-%\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter.\ #1}{}}
+    % Изменяем поведение частей, разделов, подразделов для корректного попадания в TOC
+    \let\oldchapter\chapter
+    \renewcommand{\thechapter}{\Asbuk{chapter}}
+    \renewcommand{\chapter}[1]{%
+        \stepcounter{chapter}%
+        \oldchapter*{\appendixname~\thechapter.~#1}%
+        \addcontentsline{toc}{section}{\appendixname~\thechapter.~#1}%
+        \stepcounter{totalappendices}%
+    }
 
-%\begin{appendices}
+    \let\oldsection\section
+    \renewcommand{\section}[1]{
+        \stepcounter{section}%
+        \oldsection*{\thesection~#1}%
+    }
+    \let\oldsubsection\subsection
+    \renewcommand{\subsection}[1]{
+        \stepcounter{subsection}
+        \oldsubsection*{\thesubsection~#1}
+    }
 
-\input{3-content/10-appendix-1}
+    % Первое приложение не переносится на новую страницу
+    \makeatletter
+    \let\oldclearpage\clearpage
+    \let\clearpage\relax
+    \makeatother
+    \input{3-content/10-appendix-1}
+    \makeatletter
+    \let\clearpage\oldclearpage
+    \makeatother
 
-\clearpage
+    % Последующие приложения.
+    \clearpage
+    \input{3-content/11-appendix-2}
+    \clearpage
+    \input{3-content/12-appendix-3}
 
-\input{3-content/11-appendix-2}
+    % Восстанавливаем все как было
+    \let\chapter\oldchapter
+    \let\section\oldsection
+    \let\subsection\oldsubsection
+\end{appendices}
 
-\clearpage
-
-\input{3-content/12-appendix-3}
-
-%\end{appendices}
+%--- КОНЕЦ СЕКЦИИ ПРИЛОЖЕНИЙ ---
 
 \label{end_of_document}
