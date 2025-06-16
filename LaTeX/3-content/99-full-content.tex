@@ -81,6 +81,7 @@
 \label{end_of_main_text}
 
 %--- КОНЕЦ СЕКЦИИ БИБЛИОГРАФИИ ---
+%--- СЕКЦИЯ ПРИЛОЖЕНИЙ ---
 \clearpage
 \label{sec:appendices}
 
@@ -92,7 +93,7 @@
     \let\oldchapter\chapter
     \renewcommand{\thechapter}{\Asbuk{chapter}}
     \renewcommand{\chapter}[1]{%
-        \stepcounter{chapter}%
+        \refstepcounter{chapter}%
         \oldchapter*{\appendixname~\thechapter.~#1}%
         \addcontentsline{toc}{section}{\appendixname~\thechapter.~#1}%
         \stepcounter{totalappendices}%
@@ -119,11 +120,11 @@
     \let\clearpage\oldclearpage
     \makeatother
 
-    % Последующие приложения.
-    \clearpage
-    \input{3-content/11-appendix-2}
-    \clearpage
-    \input{3-content/12-appendix-3}
+    % % Последующие приложения.
+    % \clearpage
+    % \input{3-content/11-appendix-2}
+    % \clearpage
+    % \input{3-content/12-appendix-3}
 
     % Восстанавливаем все как было
     \let\chapter\oldchapter
