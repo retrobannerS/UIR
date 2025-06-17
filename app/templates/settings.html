@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки - NLIDB</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <div class="service-icon">
+                        <i class="fas fa-database"></i>
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <span class="app-title">NLIDB</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <nav class="nav-items">
+                    <a href="/queries" class="nav-item" id="nav-queries">Запросы</a>
+                </nav>
+                <div class="user-profile">
+                    <div id="user-avatar" class="user-avatar-placeholder"></div>
+                    <div id="user-menu" class="dropdown-menu">
+                        <a href="/help" id="help-link" class="dropdown-item">
+                            <i class="fas fa-question-circle dropdown-icon"></i>
+                            <span>Помощь</span>
+                        </a>
+                        <div id="settings-link" class="dropdown-item active">
+                            <i class="fas fa-cog dropdown-icon"></i>
+                            <span>Настройки</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <button id="logout-button" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt dropdown-icon"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content for Settings Page -->
+        <div class="main-content">
+            <section class="content-section">
+                <div class="section-header">
+                    <h2>Настройки пользователя</h2>
+                </div>
+                <div class="settings-page-content">
+                    <div class="settings-content">
+                        <!-- Avatar Section -->
+                        <div class="setting-block">
+                            <h3>Смена аватара</h3>
+                            <div class="avatar-setting">
+                                <div class="avatar-container">
+                                    <img id="avatar-preview" src="" alt="User Avatar" class="avatar-preview-image">
+                                    <p id="avatar-nickname" class="avatar-nickname-display"></p>
+                                </div>
+                                <div class="avatar-actions">
+                                    <button id="open-avatar-modal-btn" class="btn-secondary">Изменить аватар</button>
+                                    <button id="delete-avatar-btn" class="btn-danger">Удалить аватар</button>
+                                </div>
+                                <input type="file" id="avatar-upload-input" accept="image/png, image/jpeg" hidden>
+                            </div>
+                        </div>
+
+                        <!-- Username Section -->
+                        <div class="setting-block">
+                            <h3>Смена имени пользователя</h3>
+                            <form id="username-change-form">
+                                <div class="username-update-container">
+                                    <div class="input-wrapper">
+                                        <input type="text" id="new-username-input" class="form-control"
+                                            name="new-username" required placeholder="Новое имя пользователя">
+                                        <i id="username-status-icon" class="status-icon"></i>
+                                    </div>
+                                    <button type="submit" id="save-username-button" class="btn-primary"
+                                        disabled>Сохранить</button>
+                                </div>
+                                <div class="input-hint username-hint"></div>
+                            </form>
+                            <div class="form-message" id="username-form-message"></div>
+                        </div>
+
+                        <!-- Password Section -->
+                        <div class="setting-block">
+                            <h3>Смена пароля</h3>
+                            <form id="password-change-form" novalidate>
+                                <div class="form-group">
+                                    <label for="old-password">Старый пароль</label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="old-password" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">Новый пароль</label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="new-password" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Подтвердите новый пароль</label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="confirm-password" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div id="password-hint" class="input-hint"></div>
+                                <button type="submit" id="save-password-button" class="btn-primary" disabled>Сохранить
+                                    пароль</button>
+                            </form>
+                        </div>
+
+                        <!-- Other settings can go here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 NLIDB. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <!-- Avatar Upload Modal -->
+    <div id="avatar-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Изменить аватар</h2>
+            <p>Для лучших результатов загружайте квадратное изображение.</p>
+            <div class="modal-avatar-preview">
+                <img id="modal-avatar-image" src="" alt="Avatar Preview">
+            </div>
+            <div class="modal-actions">
+                <label for="avatar-upload-input" class="btn-primary">Выбрать файл</label>
+                <div>
+                    <button id="cancel-avatar-upload" class="btn-secondary">Отмена</button>
+                    <button id="confirm-avatar-upload" class="btn-primary" disabled>Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/settings.js"></script>
+</body>
+
+</html>

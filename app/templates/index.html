@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-SQL</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <div class="service-icon">
+                        <i class="fas fa-database"></i>
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <span class="app-title">NLIDB</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <nav class="nav-items">
+                    <a href="#" class="nav-item active" id="nav-queries">Запросы</a>
+                </nav>
+                <div class="user-profile">
+                    <div id="user-avatar" class="user-avatar-placeholder"></div>
+                    <div id="user-menu" class="dropdown-menu">
+                        <a href="/help" id="help-link" class="dropdown-item">
+                            <i class="fas fa-question-circle dropdown-icon"></i>
+                            <span>Помощь</span>
+                        </a>
+                        <a href="/settings" id="settings-link" class="dropdown-item">
+                            <i class="fas fa-cog dropdown-icon"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button id="logout-button" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt dropdown-icon"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Table Management Section -->
+            <section class="content-section" id="tables-section">
+                <div class="section-header">
+                    <h2>Управление таблицами</h2>
+                </div>
+                <div class="upload-container">
+                    <h3>Загрузить новую таблицу</h3>
+                    <p>Поддерживаются файлы .csv и .xlsx</p>
+                    <form id="upload-form" class="upload-form">
+                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden />
+                        <label for="file-input" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Выберите файл</span>
+                        </label>
+                        <span id="file-name" class="file-name">Файл не выбран</span>
+                        <button type="submit" id="upload-button" class="btn-primary" disabled>Загрузить</button>
+                    </form>
+                </div>
+                <div class="tables-list-container">
+                    <h3>Загруженные таблицы</h3>
+                    <div id="tables-list">
+                        <p class="no-tables">Нет загруженных таблиц</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Query Section -->
+            <section class="content-section" id="query-section">
+                <div class="section-header">
+                    <h2>Конструктор запросов</h2>
+                </div>
+                <div class="query-container">
+                    <p>Введите ваш запрос на естественном языке:</p>
+                    <textarea id="query-input" class="query-textarea" rows="4"
+                        placeholder="Например: сколько всего записей в таблице 'users'?"></textarea>
+                    <div class="query-controls">
+                        <button id="submit-button" class="btn-primary">Сгенерировать SQL</button>
+                        <button id="show-sql-button" class="btn-secondary">Показать SQL</button>
+                        <button id="export-button" class="btn-secondary">Экспорт в CSV</button>
+                    </div>
+
+                    <h3>Результат:</h3>
+                    <div class="result-box">
+                        <pre><code id="sql-output">... здесь появится SQL-запрос ...</code></pre>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 NLIDB. Все права защищены.</p>
+        </footer>
+
+    </div>
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>

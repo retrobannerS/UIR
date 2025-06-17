@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pandas
+openpyxl
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic[email]
+python-jose
+jinja2
+aiofiles
+sqlalchemy
+jose
+Pillow 

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Помощь - NLIDB</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Bar (Consistent with index.html) -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <div class="service-icon">
+                        <i class="fas fa-database"></i>
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <span class="app-title">NLIDB</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <nav class="nav-items">
+                    <a href="/queries" class="nav-item" id="nav-queries">Запросы</a>
+                </nav>
+                <div class="user-profile">
+                    <div id="user-avatar" class="user-avatar-placeholder"></div>
+                    <div id="user-menu" class="dropdown-menu">
+                        <div id="help-link" class="dropdown-item active">
+                            <i class="fas fa-question-circle dropdown-icon"></i>
+                            <span>Помощь</span>
+                        </div>
+                        <a href="/settings" id="settings-link" class="dropdown-item">
+                            <i class="fas fa-cog dropdown-icon"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button id="logout-button" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt dropdown-icon"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content for Help Page -->
+        <div class="main-content">
+            <section class="content-section">
+                <div class="section-header">
+                    <h2>Справочный центр</h2>
+                </div>
+                <div class="help-content">
+                    <article class="help-article">
+                        <h3><i class="fas fa-upload"></i> 1. Загрузка таблиц</h3>
+                        <p>Для начала работы вам необходимо загрузить одну или несколько таблиц в формате
+                            <strong>.csv</strong> или <strong>.xlsx</strong>. Сервис автоматически определит структуру
+                            данных и подготовит их для запросов.
+                        </p>
+                        <ul>
+                            <li>Нажмите кнопку "Выберите файл" в разделе "Управление таблицами".</li>
+                            <li>Выберите нужный файл на вашем компьютере.</li>
+                            <li>Нажмите "Загрузить". Таблица появится в списке "Загруженные таблицы".</li>
+                        </ul>
+                    </article>
+                    <article class="help-article">
+                        <h3><i class="fas fa-comment-alt"></i> 2. Формулирование запросов</h3>
+                        <p>Вы можете задавать вопросы к вашим данным на естественном русском языке. Система постарается
+                            понять ваш запрос и перевести его в SQL.</p>
+                        <p><strong>Примеры хороших запросов:</strong></p>
+                        <ul>
+                            <li>"Покажи всех пользователей из Москвы"</li>
+                            <li>"Сколько заказов было сделано вчера?"</li>
+                            <li>"Какая средняя зарплата в отделе продаж?"</li>
+                            <li>"Найди топ 5 самых дорогих товаров"</li>
+                        </ul>
+                        <p>Старайтесь формулировать вопросы четко и использовать названия столбцов, если вы их знаете
+                            (например, "посчитай сумму из колонки 'price'").</p>
+                    </article>
+                    <article class="help-article">
+                        <h3><i class="fas fa-database"></i> 3. Работа с SQL и результатами</h3>
+                        <ul>
+                            <li>После ввода запроса нажмите "Сгенерировать SQL".</li>
+                            <li>В блоке "Результат" появится SQL-код, который был сгенерирован системой. Вы можете
+                                нажать "Показать SQL", чтобы увидеть его.</li>
+                            <li>Результат выполнения запроса будет отображен в виде таблицы под SQL-кодом.</li>
+                            <li>Вы можете экспортировать полученные данные в формат .csv с помощью кнопки "Экспорт в
+                                CSV".</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer (Consistent with index.html) -->
+        <footer class="footer">
+            <p>© 2025 NLIDB. Все права защищены.</p>
+        </footer>
+    </div>
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>
