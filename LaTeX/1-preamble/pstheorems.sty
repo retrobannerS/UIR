@@ -14,3 +14,13 @@
 \newtheorem{definition}{Определение}
 \newtheorem{example}{Пример}
 \newtheorem{remark}{Замечание}
+
+\newif\ifshowannotations
+\AtBeginDocument{
+  \ifshowannotations
+    \theoremstyle{plain}
+    \newtheorem*{annotation}{Аннотация}
+  \else
+    \excludecomment{annotation}
+  \fi
+}
