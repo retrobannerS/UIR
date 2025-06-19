@@ -1,40 +1,63 @@
-\title{Разработка веб-сервиса для запросов к базам данных \\ на естественном языке}
+\title{Разработка модели интеграции
+  технологического ядра XiYan-SQL во внешний
+  веб-сервис и его программная реализация}
 
 \taskdate{24.02.2025}
 
 \projecttasks{
-  \section{== TODO ==}
   \projecttask{\bfseries\projecttasknum}{\bfseries Аналитическая часть}{}{}{}
   % (указываются предмет и цели анализа)
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
   {
-    Провести анализ существующих веб-
-    сервисов, позволяющих производить запросы
-    к базам данных на естественном языке.
+    Провести обзор традиционных способов взаимодействия
+    с базами данных.
   }%
   {Список литературы, текст РСПЗ}%
-  {14.03.2025}
+  {28.02.2025}
   {
     % \signat[xsign=0pt, ysign=-10pt, scale=0.4, xdate=14pt, ydate=-22pt, date={01.01.2001}]
   }
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
   {
-    Провести анализ существующих моделей,
+    Провести обзор интерфейсов для взаимодействия
+    с базами данных.
+  }%
+  {Список литературы, текст РСПЗ}%
+  {07.03.2025}
+  {
+    % \signat[xsign=0pt, ysign=-10pt, scale=0.4, xdate=14pt, ydate=-22pt, date={01.01.2001}]
+  }
+  % ----------------------------------------
+  \projecttask{\projectsubtasknum}
+  {
+    Провести сравнение существующих систем,
     переводящих естественный язык на язык
     запросов SQL.
   }%
   {Список литературы, текст РСПЗ}%
-  {24.03.2025}
+  {14.03.2025}
   {
     % \signat[xsign=-7pt, ysign=-7pt, scale=0.32, xdate=12pt, ydate=-17pt, date={01.01.2001}]
   }
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
+  {
+    Провести сравнение существующих веб-%
+    сервисов, позволяющих производить запросы
+    к базам данных на естественном языке.
+  }%
+  {Список литературы, текст РСПЗ}%
+  {24.03.2025}
+  {
+    % \signat[xsign=0pt, ysign=-10pt, scale=0.4, xdate=14pt, ydate=-22pt, date={01.01.2001}]
+  }
+  % ----------------------------------------
+  \projecttask{\projectsubtasknum}
   {\itshape
     Оформить расширенное содержание
-    пояснительной записки (РСПЗ)
+    пояснительной записки (РСПЗ).
   }%
   {Текст РСПЗ}%
   {28.03.2025}
@@ -47,9 +70,9 @@
   % (указываются используемые и разрабатываемые модели, методы, алгоритмы)
   \projecttask{\projectsubtasknum}
   {
-    Постановить задачу о проектировании
-    внутренней базы данных и разработке блока
-    предобработки запросов
+    Поставить задачу разработки модели
+    взаимодействия серверной части внешнего сервиса
+    с системой XiYan.
   }%
   {Текст ПЗ}%
   {03.04.2025}
@@ -58,19 +81,11 @@
   }
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
-  {Спроектировать внутреннюю базу данных}%
-  {Описание моделей БД, текст ПЗ}%
+  {Смоделировать работу MCP-клиента на стороне веб-сервиса.}%
+  {Описание модели, текст ПЗ}%
   {10.04.2025}
   {
     % \signat[xsign=-7pt, ysign=-7pt, scale=0.32, xdate=12pt, ydate=-17pt, date={01.01.2001}]
-  }
-  % ----------------------------------------
-  \projecttask{\projectsubtasknum}
-  {Разработать блок предобработки запросов}%
-  {Текст ПЗ}%
-  {17.04.2025}
-  {
-    % \signat[xsign=-17pt, ysign=-2pt, scale=0.20, xdate=19pt, ydate=0pt, date={\scriptsize01.01.2001}]
   }
   % ----------------------------------------
   % ----------------------------------------
@@ -78,17 +93,17 @@
   % (указывается, что конкретно необходимо спроектировать, а также используемые для этого методы, технологии и инструментальные средства)
   \projecttask{\projectsubtasknum}
   {
-    Установить требования к системе и
-    интерфейсу пользователя
+    Сформулировать требования к системе и
+    графическому интерфейсу пользователя.
   }%
   {Текст ПЗ}%
   {24.04.2025}
   {
     % \signat[xsign=-10pt, ysign=-4pt, scale=0.25, xdate=16pt, ydate=-10pt,
-    date={\footnotesize01.01.2001}]
+    % date={\footnotesize01.01.2001}]
   }
   \projecttask{\projectsubtasknum}
-  {Разработать архитектуру веб-сервиса}%
+  {Разработать архитектуру прототипа веб-сервиса.}%
   {Текст ПЗ}%
   {27.04.2025}
   {\
@@ -97,8 +112,8 @@
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
   {
-    Выбрать стек технологий и
-    описать причину его выбора
+    Выбрать стек технологий для разработки и
+    привести обоснования его выбора.
   }%
   {Текст ПЗ}%
   {01.05.2025}
@@ -106,9 +121,13 @@
     % \signat[xsign=-12pt, ysign=-4pt, scale=0.25, xdate=14pt, ydate=-10pt, date={\footnotesize01.01.2001}]
   }
   % ----------------------------------------
+  % ----------------------------------------
   \projecttask{\projectsubtasknum}
-  {Описать функционал веб-сервиса}%
-  {Текст ПЗ}%
+  {Выполнить программную реализацию прототипа веб-сервиса}%
+  {
+    Описание основных функций и
+    модулей, текст ПЗ
+  }%
   {08.05.2025}
   {
     % % \signat[xsign=-10pt, ysign=4pt, scale=0.25, xdate=17pt, ydate=-2pt, date={\scriptsize01.01.2001}]
@@ -116,37 +135,26 @@
   % ----------------------------------------
   \projecttask{\projectsubtasknum}
   {
-    Описать программную реализацию системы
-    (основные классы и функции)
+    Реализовать графический пользовательский интерфейс
   }%
-  {Текст ПЗ}%
+  {Описание графического интерфейса, текст ПЗ}%
   {17.05.2025}
-  {
-    % \signat[xsign=-12pt, ysign=-4pt, scale=0.25, xdate=14pt, ydate=-10pt, date={\footnotesize01.01.2001}]
-  }
-  % ----------------------------------------
-  % ----------------------------------------
-  \projecttask{\bfseries\projecttasknum}{\bfseries Технологическая и практическая часть}{}{}{}
-  % (указывается, что конкретно должно быть реализовано и протестировано, а также используемые для этого методы, инструментальные средства, технологии)
-  \projecttask{\projectsubtasknum}
-  {
-    Протестировать систему на тренировочной
-    базе данных
-  }%
-  {Исполняемые тестовые файлы, текст ПЗ}%
-  {19.05.2025}
-  {
-    % \signat[xsign=-7pt, ysign=-7pt, scale=0.32, xdate=12pt, ydate=-17pt, date={01.01.2001}]
-  }
-  % ----------------------------------------
-  \projecttask{\projectsubtasknum}
-  {Описать процесс работы пользователя с веб-сервисом}%
-  {Текст ПЗ}%
-  {21.05.2025}
   {
     % % \signat[xsign=0pt, ysign=-5pt, scale=0.4, ydate=-20pt, date={\small01.01.2001}]
   }
   % ----------------------------------------
+  \projecttask{\projectsubtasknum}
+  {
+    Провести тестирование прототипа веб-сервиса
+  }%
+  {Текст ПЗ}%
+  {21.05.2025}
+  {
+    % \signat[xsign=-12pt, ysign=-4pt, scale=0.25, xdate=14pt, ydate=-10pt, date={\footnotesize01.01.2001}]
+  }
+  % ----------------------------------------
+  \projecttask{\bfseries\projecttasknum}{\bfseries Технологическая и практическая часть}{}{}{}
+  % (указывается, что конкретно должно быть реализовано и протестировано, а также используемые для этого методы, инструментальные средства, технологии)
   \projecttask{\bfseries\projecttasknum}
   {\itshape
     Оформить пояснительную записку (ПЗ) и
@@ -162,14 +170,12 @@
 }
 
 \taskliterature{
-  \section{== TODO ==}
   \nocite{
-    sidorovEstestvennyeIskusstvennyeYazyki2024,
-    kimNaturalLanguageSQL2020,
     borodinZadacheSostavleniyaZaprosov2016,
-    polonskiyPerevodRusskogoEstestvennogo2023,
-    LLMyPreobrazovaniiZaprosa2023,
-    zhuAutomatedCrossdomainExploratory2024
+    kimNaturalLanguageSQL2020,
+    zhuLargeLanguageModel2024,
+    huangExploringLandscapeTexttoSQL2025,
+    gaoPreviewXiYanSQLMultiGenerator2025
   }
 }
 
@@ -197,23 +203,35 @@
 
 
 % ## Утверждение задания руководителем и студентом
-\authortaskapproval{\sign[5pt]{.15}{author}}
-\supervisortaskapproval{\sign[0pt]{.35}{supervisor}}
+\authortaskapproval{
+  % \sign[5pt]{.15}{author}
+}
+\supervisortaskapproval{
+  % \sign[0pt]{.35}{supervisor}
+}
 
 % ## Утверждение РСПЗ руководителем, студентом и консультантом
-\authorrspzapproval{\sign[10pt]{.20}{author}}
-\supervisorrspzapproval{\sign[0pt]{.35}{supervisor}}
+\authorrspzapproval{
+  % \sign[10pt]{.20}{author}
+}
+\supervisorrspzapproval{
+  % \sign[0pt]{.35}{supervisor}
+}
 \consultantrspzapproval{}
 
 % ## Оценка руководителя и консультанта за РСПЗ
-\supervisorrspzgrade{10 б.}
+\supervisorrspzgrade{}
 \consultantrspzgrade{}
 
 % ## Утверждение ПЗ руководителем, студентом и консультантом
-\authorpzapproval{\sign[10pt]{.20}{author}}
-\supervisorpzapproval{\sign[0pt]{.35}{supervisor}}
+\authorpzapproval{
+  % \sign[10pt]{.20}{author}
+}
+\supervisorpzapproval{
+  % \sign[0pt]{.35}{supervisor}
+}
 \consultantpzapproval{}
 
 % ## Оценка руководителя за ПЗ
-\supervisorpzgrade{12 б.}
+\supervisorpzgrade{}
 \consultantpzgrade{}
