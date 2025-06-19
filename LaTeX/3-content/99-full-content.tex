@@ -48,10 +48,6 @@
 
 \clearpage
 
-\input{3-content/07-chapter-4}
-
-\clearpage
-
 \input{3-content/08-conclusion}
 
 \setcounter{totalfigures}{\the\value{totalfigures}+\the\value{figure}}
@@ -115,16 +111,7 @@
     \let\oldclearpage\clearpage
     \let\clearpage\relax
     \makeatother
-    \input{3-content/10-appendix-1}
-    \makeatletter
-    \let\clearpage\oldclearpage
-    \makeatother
-
-    % % Последующие приложения.
-    % \clearpage
-    % \input{3-content/11-appendix-2}
-    % \clearpage
-    % \input{3-content/12-appendix-3}
+    \input{3-content/10-appendices}
 
     % Восстанавливаем все как было
     \let\chapter\oldchapter
