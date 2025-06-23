@@ -61,12 +61,15 @@
                             <h3>Смена аватара</h3>
                             <div class="avatar-setting">
                                 <div class="avatar-container">
-                                    <img id="avatar-preview" src="" alt="User Avatar" class="avatar-preview-image">
+                                    <div id="avatar-placeholder" class="avatar-preview-image"></div>
+                                    <img id="avatar-preview" src="" alt="User Avatar" class="avatar-preview-image"
+                                        style="display: none;">
                                     <p id="avatar-nickname" class="avatar-nickname-display"></p>
                                 </div>
                                 <div class="avatar-actions">
                                     <button id="open-avatar-modal-btn" class="btn-secondary">Изменить аватар</button>
-                                    <button id="delete-avatar-btn" class="btn-danger">Удалить аватар</button>
+                                    <button id="delete-avatar-btn" class="btn btn-danger" disabled>Удалить
+                                        аватар</button>
                                 </div>
                                 <input type="file" id="avatar-upload-input" accept="image/png, image/jpeg" hidden>
                             </div>
@@ -97,24 +100,47 @@
                                 <div class="form-group">
                                     <label for="old-password">Старый пароль</label>
                                     <div class="password-input-container">
-                                        <input type="password" id="old-password" class="form-control" required>
+                                        <input type="password" id="old-password" class="form-control" required
+                                            placeholder="Введите старый пароль">
+                                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="new-password">Новый пароль</label>
                                     <div class="password-input-container">
-                                        <input type="password" id="new-password" class="form-control" required>
+                                        <input type="password" id="new-password" class="form-control" required
+                                            placeholder="Введите новый пароль">
+                                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
+                                    </div>
+                                    <div class="password-requirements">
+                                        <div class="requirement" data-requirement="length">
+                                            <i class="fas fa-circle"></i>
+                                            <span>От 8 до 20 символов</span>
+                                        </div>
+                                        <div class="requirement" data-requirement="number">
+                                            <i class="fas fa-circle"></i>
+                                            <span>Минимум одна цифра</span>
+                                        </div>
+                                        <div class="requirement" data-requirement="latin">
+                                            <i class="fas fa-circle"></i>
+                                            <span>Только латинские буквы и цифры</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="confirm-password">Подтвердите новый пароль</label>
                                     <div class="password-input-container">
-                                        <input type="password" id="confirm-password" class="form-control" required>
+                                        <input type="password" id="confirm-password" class="form-control" required
+                                            placeholder="Подтвердите новый пароль">
+                                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
+                                    </div>
+                                    <div class="input-hint password-match-hint" style="display: none;">
                                     </div>
                                 </div>
-                                <div id="password-hint" class="input-hint"></div>
-                                <button type="submit" id="save-password-button" class="btn-primary" disabled>Сохранить
+                                <button type="submit" id="save-password-button" class="btn-primary btn-full-width"
+                                    disabled>Сохранить
                                     пароль</button>
+                                <div class="form-message" id="password-form-message"></div>
                             </form>
                         </div>
 
@@ -139,15 +165,22 @@
                 <img id="modal-avatar-image" src="" alt="Avatar Preview">
             </div>
             <div class="modal-actions">
-                <label for="avatar-upload-input" class="btn-primary">Выбрать файл</label>
-                <div>
-                    <button id="cancel-avatar-upload" class="btn-secondary">Отмена</button>
-                    <button id="confirm-avatar-upload" class="btn-primary" disabled>Сохранить</button>
+                <label for="avatar-upload-input" class="btn-primary btn-block">
+                    <i class="fas fa-upload"></i> Выбрать файл
+                </label>
+                <div class="modal-actions-group">
+                    <button id="cancel-avatar-upload" class="btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button id="confirm-avatar-upload" class="btn-primary" disabled>
+                        <i class="fas fa-check"></i> Сохранить
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="/static/js/user-data.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/settings.js"></script>
 </body>

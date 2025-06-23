@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
-from db.base_class import Base
+from db.base import Base
 
 
 class User(Base):
@@ -16,4 +16,4 @@ class User(Base):
     avatar_url = Column(String, nullable=True)
     is_default_avatar = Column(Boolean, default=True)
 
-    tables = relationship("UserTable", back_populates="owner")
+    tables = relationship("Table", back_populates="owner", cascade="all, delete-orphan")

@@ -7,13 +7,13 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from core.config import settings
-from crud import crud_user
+from features.users import crud as users_crud
+from features.users.models import User
 from db.session import get_db
-from schemas.token import TokenData
-from db.models.user import User
+from features.users.schemas import TokenData
 
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/login/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login/access-token")
 
 
 def get_current_user(
@@ -24,12 +24,19 @@ def get_current_user(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         token_data = TokenData(**payload)
-    except (jwt.JWTError, ValidationError):
+    except (jwt.JWTError, ValidationError) as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud_user.user.get(db, id=token_data.id)
+    try:
+        user_id = int(token_data.sub)
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token subject",
+        )
+    user = users_crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -38,7 +45,7 @@ def get_current_user(
 def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not current_user.is_active:
+    if not users_crud.user.is_active(current_user):
         raise HTTPException(status_code=403, detail="Inactive user")
     return current_user
 
@@ -46,7 +53,7 @@ def get_current_active_user(
 def get_current_active_superuser(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not crud_user.is_superuser(current_user):
+    if not users_crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )

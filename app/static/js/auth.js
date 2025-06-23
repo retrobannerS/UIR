@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const authTabs = document.querySelectorAll('.auth-tab');
-    const passwordToggles = document.querySelectorAll('.password-toggle');
+    const passwordToggles = document.querySelectorAll('.toggle-password');
 
     // --- Tab Switching Logic ---
     authTabs.forEach(tab => {
@@ -29,37 +29,68 @@ document.addEventListener('DOMContentLoaded', () => {
             const input = toggle.previousElementSibling;
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
             input.setAttribute('type', type);
-            toggle.classList.toggle('fa-eye');
-            toggle.classList.toggle('fa-eye-slash');
+            const icon = toggle.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         });
     });
 
     // --- Registration Form Logic ---
     const registerUsernameInput = document.getElementById('registerUsername');
     const registerPasswordInput = document.getElementById('registerPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const registerButton = registerForm.querySelector('button[type="submit"]');
     const usernameHint = document.querySelector('.username-hint');
-    const usernameCheck = document.querySelector('.username-check');
-    const usernameCross = document.querySelector('.username-cross');
+    const passwordMatchHint = document.querySelector('.password-match-hint');
     const requirements = document.querySelectorAll('.requirement');
+
+    let isUsernameValid = false;
+    let isPasswordComplex = false;
+    let doPasswordsMatch = false;
+
+    registerButton.disabled = true;
+
+    const updateRegisterButtonState = () => {
+        registerButton.disabled = !(isUsernameValid && isPasswordComplex && doPasswordsMatch);
+    };
+
+    const updateRequirement = (hintElement, isValid, text) => {
+        const icon = hintElement.querySelector('i');
+        const span = hintElement.querySelector('span');
+
+        hintElement.style.display = text ? 'flex' : 'none';
+        span.textContent = text;
+
+        // Use success/error classes for unified color styling
+        hintElement.classList.remove('valid', 'success', 'error');
+        if (text) {
+            hintElement.classList.add(isValid ? 'success' : 'error');
+        }
+
+        if (isValid) {
+            icon.className = 'fas fa-check-circle';
+        } else {
+            // Only show cross icon if there is text, otherwise no icon
+            icon.className = text ? 'fas fa-times-circle' : '';
+        }
+    };
 
     // Username validation with debounce
     let usernameTimeout;
     const checkUsername = async (username) => {
         const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-        usernameHint.classList.remove('error', 'success');
-        usernameCheck.classList.add('hidden');
-        usernameCross.classList.add('hidden');
 
         if (!username) {
-            usernameHint.textContent = 'Введите имя пользователя';
-            usernameHint.classList.add('error');
+            updateRequirement(usernameHint, false, '');
+            isUsernameValid = false;
+            updateRegisterButtonState();
             return false;
         }
 
         if (!usernameRegex.test(username)) {
-            usernameHint.textContent = 'Только латинские буквы, цифры и `_` (3-20 симв.)';
-            usernameHint.classList.add('error');
-            usernameCross.classList.remove('hidden');
+            updateRequirement(usernameHint, false, 'Только латинские буквы, цифры и `_` (3-20 симв.)');
+            isUsernameValid = false;
+            updateRegisterButtonState();
             return false;
         }
 
@@ -68,25 +99,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!data.exists) {
-                usernameHint.textContent = 'Имя пользователя доступно';
-                usernameHint.classList.add('success');
-                usernameCheck.classList.remove('hidden');
+                updateRequirement(usernameHint, true, 'Имя пользователя доступно');
+                isUsernameValid = true;
+                updateRegisterButtonState();
                 return true;
             } else {
-                usernameHint.textContent = 'Имя пользователя уже занято';
-                usernameHint.classList.add('error');
-                usernameCross.classList.remove('hidden');
+                updateRequirement(usernameHint, false, 'Имя пользователя уже занято');
+                isUsernameValid = false;
+                updateRegisterButtonState();
                 return false;
             }
         } catch (error) {
             console.error('Error checking username:', error);
-            usernameHint.textContent = 'Ошибка при проверке имени';
-            usernameHint.classList.add('error');
+            updateRequirement(usernameHint, false, 'Ошибка при проверке имени');
+            isUsernameValid = false;
+            updateRegisterButtonState();
             return false;
         }
     };
 
     registerUsernameInput.addEventListener('input', (e) => {
+        isUsernameValid = false; // Invalidate while typing/debouncing
+        updateRegisterButtonState();
         clearTimeout(usernameTimeout);
         usernameTimeout = setTimeout(() => {
             checkUsername(e.target.value);
@@ -95,61 +129,100 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Password validation
     const validatePassword = (password) => {
+        if (password.length === 0) {
+            requirements.forEach(req => {
+                req.classList.remove('valid');
+                const icon = req.querySelector('i');
+                icon.className = 'fas fa-circle';
+            });
+            isPasswordComplex = false;
+            updateRegisterButtonState();
+            return false;
+        }
+
         const checks = {
             length: password.length >= 8 && password.length <= 20,
             number: /\d/.test(password),
-            latin: /^[a-zA-Z0-9]*$/.test(password) // Только латиница и цифры, без спецсимволов
+            latin: /^[a-zA-Z0-9]*$/.test(password)
         };
 
         let allValid = true;
         requirements.forEach(req => {
             const type = req.dataset.requirement;
-            // Скрываем или показываем требования, которых больше нет в `checks`
             if (checks[type] !== undefined) {
-                req.style.display = 'block';
                 const isValid = checks[type];
                 req.classList.toggle('valid', isValid);
+                const icon = req.querySelector('i');
+                icon.className = isValid ? 'fas fa-check-circle' : 'fas fa-circle';
                 if (!isValid) allValid = false;
-            } else {
-                req.style.display = 'none';
             }
         });
+        isPasswordComplex = allValid;
+        updateRegisterButtonState();
         return allValid;
+    };
+
+    // Password match validation
+    const validatePasswordMatch = () => {
+        const password = registerPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (!confirmPassword) {
+            updateRequirement(passwordMatchHint, false, '');
+            doPasswordsMatch = false;
+            updateRegisterButtonState();
+            return false;
+        }
+
+        const isMatch = password === confirmPassword;
+        const text = isMatch ? 'Пароли совпадают' : 'Пароли не совпадают';
+        updateRequirement(passwordMatchHint, isMatch, text);
+        doPasswordsMatch = isMatch;
+        updateRegisterButtonState();
+        return isMatch;
     };
 
     registerPasswordInput.addEventListener('input', (e) => {
         validatePassword(e.target.value);
+        validatePasswordMatch();
     });
+
+    confirmPasswordInput.addEventListener('input', validatePasswordMatch);
 
     // Registration form submission
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = registerUsernameInput.value;
         const password = registerPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
         const errorElement = document.getElementById('registerError');
 
-        const isUsernameValid = await checkUsername(username);
-        const isPasswordValid = validatePassword(password);
+        // Final check on submit, although button state should prevent this.
+        const isUsernameReady = await checkUsername(username);
+        const isPasswordReady = validatePassword(password);
+        const doPasswordsMatch = validatePasswordMatch();
 
-        if (!isUsernameValid || !isPasswordValid) {
+        if (!isUsernameReady || !isPasswordReady || !doPasswordsMatch) {
             errorElement.textContent = 'Пожалуйста, исправьте ошибки в форме.';
             return;
         }
 
         try {
-            const response = await fetch('/api/v1/register', {
+            const response = await fetch('/api/v1/users/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            const data = await response.json();
 
-            if (response.ok) {
-                // Automatically log in after successful registration
-                loginUser(username, password, 'loginError'); // Use login error field for feedback
-            } else {
+            if (!response.ok) {
+                const data = await response.json();
                 errorElement.textContent = data.detail || 'Ошибка при регистрации.';
+                return;
             }
+
+            const data = await response.json();
+            // Automatically log in after successful registration
+            loginUser(username, password, 'loginError'); // Use login error field for feedback
         } catch (error) {
             errorElement.textContent = 'Произошла ошибка сети.';
             console.error('Registration error:', error);
@@ -172,8 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('username', username);
         formData.append('password', password);
 
+        // Clear previous error message
+        errorElement.textContent = '';
+
         try {
-            const response = await fetch('/api/v1/login/access-token', {
+            const response = await fetch('/api/v1/users/login/access-token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData
@@ -184,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('accessToken', data.access_token);
                 window.location.href = '/queries'; // Redirect to main page
             } else {
-                errorElement.textContent = data.detail || 'Неверные учетные данные.';
+                errorElement.textContent = 'Неправильное имя пользователя или пароль';
             }
         } catch (error) {
             errorElement.textContent = 'Произошла ошибка сети.';

@@ -49,54 +49,49 @@
         </header>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Table Management Section -->
-            <section class="content-section" id="tables-section">
-                <div class="section-header">
-                    <h2>Управление таблицами</h2>
+        <div class="main-content query-page-layout">
+            <aside class="sidebar-left">
+                <div class="sidebar-header">
+                    <h3>Мои таблицы</h3>
+                    <button id="add-table-btn" class="btn-icon" title="Добавить таблицу">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
-                <div class="upload-container">
-                    <h3>Загрузить новую таблицу</h3>
-                    <p>Поддерживаются файлы .csv и .xlsx</p>
-                    <form id="upload-form" class="upload-form">
-                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden />
-                        <label for="file-input" class="file-label">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Выберите файл</span>
-                        </label>
-                        <span id="file-name" class="file-name">Файл не выбран</span>
-                        <button type="submit" id="upload-button" class="btn-primary" disabled>Загрузить</button>
-                    </form>
-                </div>
-                <div class="tables-list-container">
-                    <h3>Загруженные таблицы</h3>
-                    <div id="tables-list">
-                        <p class="no-tables">Нет загруженных таблиц</p>
-                    </div>
-                </div>
-            </section>
+                <ul id="tables-list-sidebar" class="tables-list-sidebar">
+                    <!-- Tables will be loaded here by JavaScript -->
+                    <li class="no-tables-placeholder" style="display: none;">
+                        <div class="placeholder-content">
+                            <i class="fas fa-table"></i>
+                            <h4>Таблицы не найдены</h4>
+                            <p>У вас еще нет загруженных таблиц.</p>
+                        </div>
+                    </li>
+                </ul>
+            </aside>
 
             <!-- Query Section -->
-            <section class="content-section" id="query-section">
-                <div class="section-header">
-                    <h2>Конструктор запросов</h2>
-                </div>
-                <div class="query-container">
-                    <p>Введите ваш запрос на естественном языке:</p>
-                    <textarea id="query-input" class="query-textarea" rows="4"
-                        placeholder="Например: сколько всего записей в таблице 'users'?"></textarea>
-                    <div class="query-controls">
-                        <button id="submit-button" class="btn-primary">Сгенерировать SQL</button>
-                        <button id="show-sql-button" class="btn-secondary">Показать SQL</button>
-                        <button id="export-button" class="btn-secondary">Экспорт в CSV</button>
+            <main class="query-main-content">
+                <section class="content-section" id="query-section">
+                    <div class="section-header">
+                        <h2>Конструктор запросов</h2>
                     </div>
+                    <div class="query-container">
+                        <p>Введите ваш запрос на естественном языке:</p>
+                        <textarea id="query-input" class="query-textarea" rows="4"
+                            placeholder="Например: сколько всего записей в таблице 'users'?"></textarea>
+                        <div class="query-controls">
+                            <button id="submit-button" class="btn-primary">Сгенерировать SQL</button>
+                            <button id="show-sql-button" class="btn-secondary">Показать SQL</button>
+                            <button id="export-button" class="btn-secondary">Экспорт в CSV</button>
+                        </div>
 
-                    <h3>Результат:</h3>
-                    <div class="result-box">
-                        <pre><code id="sql-output">... здесь появится SQL-запрос ...</code></pre>
+                        <h3>Результат:</h3>
+                        <div class="result-box">
+                            <pre><code id="sql-output">... здесь появится SQL-запрос ...</code></pre>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </main>
         </div>
 
         <!-- Footer -->
@@ -105,6 +100,62 @@
         </footer>
 
     </div>
+
+    <!-- Add Table Modal -->
+    <div id="add-table-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-wide">
+            <h2 class="modal-title">Загрузить новую таблицу</h2>
+
+            <div class="form-row">
+                <div class="form-group form-group-grow">
+                    <input type="text" id="table-name-input" class="form-control" placeholder="Имя таблицы" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="preview-rows-select">Строк</label>
+                    <div class="select-container">
+                        <select id="preview-rows-select" class="form-control">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="table-preview-container" class="table-preview-container">
+                <div id="table-preview-placeholder" class="table-preview-placeholder">
+                    <i class="fas fa-table"></i>
+                    <p>Предпросмотр таблицы появится здесь</p>
+                </div>
+                <table id="table-preview" class="table-preview" style="display: none;">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="upload-error-message" class="form-message error" style="display: none;"></div>
+
+            <input type="file" id="file-upload-input" accept=".csv,.xlsx" hidden>
+
+            <div class="modal-actions">
+                <label for="file-upload-input" class="btn-primary btn-block">
+                    <i class="fas fa-file-upload"></i> Выбрать файл
+                </label>
+                <div class="modal-actions-group">
+                    <button id="cancel-upload-btn" class="btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button id="confirm-upload-btn" class="btn-primary" disabled>
+                        <i class="fas fa-check"></i> Загрузить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/user-data.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 

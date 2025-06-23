@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from typing import Any, Dict, Optional, Union
 
 from core.security import get_password_hash, verify_password
-from .base import CRUDBase
-from db.models.user import User
-from schemas.user import UserCreate, UserUpdate
+from db.base_crud import CRUDBase
+from features.users.models import User
+from .schemas import UserCreate, UserUpdate
 from services.avatar_service import generate_avatar
 
 
@@ -13,10 +13,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db.query(User).filter(User.username == username).first()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
+        # Generate default avatar before creating the user object
+        avatar_url = generate_avatar(obj_in.username)
+
         db_obj = User(
             username=obj_in.username,
             hashed_password=get_password_hash(obj_in.password),
-            is_superuser=False,  # Default value
+            avatar_url=avatar_url,
+            is_default_avatar=True,
+            is_superuser=False,
         )
         db.add(db_obj)
         db.commit()
@@ -40,6 +45,19 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
+
+    def is_active(self, user: User) -> bool:
+        return user.is_active
+
+    def authenticate(
+        self, db: Session, *, username: str, password: str
+    ) -> Optional[User]:
+        user = self.get_by_username(db, username=username)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
 
 
 user = CRUDUser(User)

@@ -1,13 +1,24 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import os
 
 from api.v1.api import api_router
 from core.middleware import CacheBustingMiddleware
+from core.config import settings
 from db.base import Base
 from db.session import engine
+from services.text_to_sql_service import convert_text_to_sql
+
+# Create all tables in the database
+Base.metadata.create_all(bind=engine)
+
+# Create uploads directory if it doesn't exist
+os.makedirs(settings.UPLOADS_DIR, exist_ok=True)
+os.makedirs(os.path.join(settings.UPLOADS_DIR, "avatars"), exist_ok=True)
+os.makedirs(os.path.join(settings.UPLOADS_DIR, "tables"), exist_ok=True)
 
 
 def create_tables():
@@ -19,7 +30,9 @@ def create_tables():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Code to run on startup
-    create_tables()
+    avatars_dir = os.path.join(settings.UPLOADS_DIR, "avatars")
+    os.makedirs(avatars_dir, exist_ok=True)
+    # create_tables()
     yield
     # Code to run on shutdown
 
@@ -39,23 +52,37 @@ def create_app() -> FastAPI:
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
     app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+    @app.get("/uploads/avatars/{filename:path}")
+    async def get_avatar(filename: str):
+        file_path = f"uploads/avatars/{filename}"
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="File not found")
+
+        headers = {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        return FileResponse(file_path, headers=headers)
+
     app.include_router(api_router, prefix="/api/v1")
 
     @app.get("/login")
     async def read_login():
         return FileResponse("templates/login.html")
 
-    @app.get("/queries")
-    async def read_queries(request: Request):
-        return FileResponse("templates/index.html")
+    @app.get("/queries", response_class=HTMLResponse)
+    async def queries_page(request: Request):
+        return HTMLResponse(content=open("templates/index.html").read())
 
-    @app.get("/help")
-    async def read_help():
-        return FileResponse("templates/help.html")
+    @app.get("/help", response_class=HTMLResponse)
+    async def help_page(request: Request):
+        return HTMLResponse(content=open("templates/help.html").read())
 
-    @app.get("/settings")
-    async def read_settings():
-        return FileResponse("templates/settings.html")
+    @app.get("/settings", response_class=HTMLResponse)
+    async def settings_page(request: Request):
+        return HTMLResponse(content=open("templates/settings.html").read())
 
     @app.get("/")
     async def read_root():

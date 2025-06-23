@@ -37,7 +37,7 @@
                     <label for="loginPassword">Пароль</label>
                     <div class="password-input-container">
                         <input type="password" id="loginPassword" name="password" required placeholder="Введите пароль">
-                        <i class="fas fa-eye-slash password-toggle"></i>
+                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">Войти</button>
@@ -51,17 +51,18 @@
                     <div class="input-container">
                         <input type="text" id="registerUsername" name="username" required
                             placeholder="Придумайте имя пользователя">
-                        <i class="fas fa-check username-check hidden"></i>
-                        <i class="fas fa-times username-cross hidden"></i>
                     </div>
-                    <div class="input-hint username-hint"></div>
+                    <div class="input-hint username-hint requirement" style="display: none;">
+                        <i class="fas fa-circle"></i>
+                        <span></span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="registerPassword">Пароль</label>
                     <div class="password-input-container">
                         <input type="password" id="registerPassword" name="password" required
                             placeholder="Придумайте пароль">
-                        <i class="fas fa-eye-slash password-toggle"></i>
+                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
                     </div>
                     <div class="password-requirements">
                         <div class="requirement" data-requirement="length">
@@ -76,6 +77,18 @@
                             <i class="fas fa-circle"></i>
                             <span>Только латинские буквы и цифры</span>
                         </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Подтверждение пароля</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required
+                            placeholder="Повторите пароль">
+                        <span class="toggle-password"><i class="fas fa-eye"></i></span>
+                    </div>
+                    <div class="input-hint password-match-hint" style="display: none;">
+                        <i class="fas fa-circle"></i>
+                        <span></span>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">Зарегистрироваться</button>

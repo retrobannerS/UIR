@@ -1,129 +1,243 @@
-import pandas as pd
-from typing import List, Dict
 import os
-from fastapi import UploadFile
+import shutil
+import uuid
+from fastapi import UploadFile, HTTPException, status
+from sqlalchemy.orm import Session
+import pandas as pd
+from io import BytesIO
+from typing import Optional
 import logging
-from db.base import User
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+from features.users.models import User
+from features.tables import crud
+from features.tables.schemas import TableCreate, TableUpdate
+from core.config import settings
+
 logger = logging.getLogger(__name__)
 
 
-class TableService:
-    def __init__(self):
-        # Dictionary to store tables by username and table_name
-        self.tables: Dict[str, Dict[str, pd.DataFrame]] = {}
-        self.upload_dir = "uploads"
-        os.makedirs(self.upload_dir, exist_ok=True)
-        logger.info(f"TableService initialized. Upload directory: {self.upload_dir}")
-
-    async def save_uploaded_file(self, file: UploadFile, user: User) -> dict:
-        """Upload and process a table file (CSV or Excel) for a specific user"""
-        logger.info(
-            f"Processing file upload: {file.filename} for user: {user.username}"
+def validate_and_sanitize_table_name(db: Session, user_id: int, table_name: str) -> str:
+    """
+    Validates the table name against business rules and checks for uniqueness.
+    """
+    try:
+        # Use Pydantic model for validation
+        validated_data = TableUpdate(table_name=table_name)
+        sanitized_name = validated_data.table_name
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
         )
 
-        file_path = os.path.join(self.upload_dir, file.filename)
-        logger.info(f"Temporary file path: {file_path}")
+    # Check if a table with the same name already exists for this user
+    if crud.get_table_by_name(db, user_id=user_id, table_name=sanitized_name):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Таблица с именем '{sanitized_name}' уже существует.",
+        )
+    return sanitized_name
 
-        try:
-            # Save the file temporarily
-            with open(file_path, "wb") as buffer:
-                content = await file.read()
-                buffer.write(content)
-            logger.info(f"File saved temporarily at: {file_path}")
 
-            # Read the file based on its extension
-            if file.filename.endswith(".csv"):
-                logger.info("Reading CSV file")
-                df = pd.read_csv(file_path)
-            elif file.filename.endswith((".xlsx", ".xls")):
-                logger.info("Reading Excel file")
-                df = pd.read_excel(file_path)
-            else:
-                raise ValueError("Unsupported file format")
+async def process_and_save_table(
+    db: Session, file: UploadFile, user: User, custom_table_name: Optional[str] = None
+) -> crud.Table:
+    # Basic validation for file type
+    if not (file.filename.endswith(".csv") or file.filename.endswith(".xlsx")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Неподдерживаемый тип файла. Пожалуйста, загрузите файл .csv или .xlsx.",
+        )
 
-            # Store the table for the user
-            table_name = os.path.splitext(file.filename)[0]
-            if user.username not in self.tables:
-                self.tables[user.username] = {}
-            self.tables[user.username][table_name] = df
-            logger.info(
-                f"Table '{table_name}' loaded successfully for user {user.username}. Shape: {df.shape}"
+    # Read content to check if file is empty
+    content = await file.read()
+    if not content:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Загруженный файл пуст.",
+        )
+    # Reset file pointer after reading
+    await file.seek(0)
+
+    # Specific check for Excel files to have only one sheet
+    if file.filename.endswith(".xlsx"):
+        xls = pd.ExcelFile(BytesIO(content))
+        if len(xls.sheet_names) != 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Excel файлы с несколькими листами не поддерживаются.",
             )
 
-            # Clean up the temporary file
+    # Determine table name
+    base_name = custom_table_name or os.path.splitext(file.filename)[0]
+
+    # Validate the determined table name
+    final_table_name = validate_and_sanitize_table_name(
+        db, user_id=user.id, table_name=base_name
+    )
+
+    # Create a unique path for the file
+    user_upload_dir = os.path.join(settings.UPLOADS_DIR, "tables", str(user.id))
+    os.makedirs(user_upload_dir, exist_ok=True)
+
+    original_filename = file.filename
+    file_extension = os.path.splitext(original_filename)[1]
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join(user_upload_dir, unique_filename)
+
+    # Save the file
+    try:
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)  # Use the content we've already read
+    except Exception as e:
+        # Clean up if file writing fails
+        if os.path.exists(file_path):
             os.remove(file_path)
-            logger.info(f"Temporary file removed: {file_path}")
-
-            return {"message": "Table uploaded successfully", "table_name": table_name}
-
-        except Exception as e:
-            logger.error(f"Error processing file: {str(e)}")
-            # Clean up the temporary file if it exists
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            raise
-
-    def get_user_tables(self, user: User) -> List[Dict[str, str]]:
-        """Get list of all tables for a specific user"""
-        if user.username not in self.tables:
-            return []
-        tables = [{"name": name} for name in self.tables[user.username].keys()]
-        logger.info(
-            f"Returning {len(tables)} tables for user {user.username}: {[t['name'] for t in tables]}"
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Не удалось сохранить файл: {e}",
         )
-        return tables
+    finally:
+        file.file.close()
 
-    def delete_table(self, table_name: str, user: User) -> bool:
-        """Delete a table by name for a specific user"""
-        logger.info(
-            f"Attempting to delete table: {table_name} for user: {user.username}"
+    # Create the table entry in the database
+    table_create = TableCreate(
+        table_name=final_table_name,
+        original_file_name=original_filename,
+        file_path=file_path,
+        user_id=user.id,
+    )
+
+    return crud.create_user_table(db, table=table_create)
+
+
+async def get_preview_from_upload(file: UploadFile, preview_rows: int = 5) -> dict:
+    """
+    Reads the first N rows of an uploaded .csv or .xlsx file for preview.
+    """
+    if not (file.filename.endswith(".csv") or file.filename.endswith(".xlsx")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Неподдерживаемый тип файла. Пожалуйста, загрузите файл .csv или .xlsx.",
         )
-        if user.username in self.tables and table_name in self.tables[user.username]:
-            del self.tables[user.username][table_name]
-            logger.info(
-                f"Table '{table_name}' deleted successfully for user {user.username}"
+
+    try:
+        content = await file.read()
+        if not content:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Загруженный файл пуст.",
             )
-            return True
-        logger.warning(f"Table '{table_name}' not found for user {user.username}")
-        return False
 
-    def get_table_preview(self, table_name: str, user: User) -> dict:
-        """Get a preview of a specific table"""
-        logger.info(
-            f"Getting preview for table: {table_name} for user: {user.username}"
+        file_stream = BytesIO(content)
+
+        if file.filename.endswith(".csv"):
+            df = pd.read_csv(file_stream)
+        else:  # .xlsx
+            # Check for multiple sheets in excel file
+            xls = pd.ExcelFile(file_stream)
+            if len(xls.sheet_names) != 1:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Excel файлы с несколькими листами не поддерживаются.",
+                )
+            df = pd.read_excel(xls, sheet_name=xls.sheet_names[0], engine="openpyxl")
+
+        if df.empty:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Файл не содержит данных.",
+            )
+
+        # Limit to N rows for preview
+        preview_df = df.head(preview_rows)
+
+        # Get header
+        header = preview_df.columns.tolist()
+
+        # Get data rows
+        data = preview_df.values.tolist()
+
+        return {"header": header, "data": data}
+
+    except pd.errors.EmptyDataError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Загруженный файл пуст или не содержит данных.",
         )
-        if user.username in self.tables and table_name in self.tables[user.username]:
-            df = self.tables[user.username][table_name]
-            preview = df.head(5).to_dict(orient="records")
-            columns = df.columns.tolist()
-            return {"preview": preview, "columns": columns, "total_rows": len(df)}
-        return None
-
-    def generate_sql_query(self, question: str, table_name: str, user: User) -> dict:
-        """Generate SQL query from natural language question"""
-        if (
-            user.username not in self.tables
-            or table_name not in self.tables[user.username]
-        ):
-            raise ValueError(f"Table {table_name} not found")
-
-        # For now, return a simple SELECT query
-        # TODO: Implement actual text-to-SQL generation
-        return {
-            "sql_query": f"SELECT * FROM {table_name} LIMIT 5",
-            "explanation": "This is a simple preview query. Text-to-SQL generation will be implemented later.",
-        }
+    except Exception as e:
+        logger.error(f"Error reading file for preview: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Не удалось обработать файл. Возможно, он поврежден или имеет неверный формат.",
+        )
+    finally:
+        await file.seek(0)  # Reset file pointer in case it's used again
 
 
-# Create a singleton instance
-table_service = TableService()
+def rename_table(db: Session, table_id: int, new_name: str, user_id: int) -> crud.Table:
+    """
+    Renames a table for a given user.
+    """
+    # First, validate the new name
+    validated_new_name = validate_and_sanitize_table_name(
+        db, user_id=user_id, table_name=new_name
+    )
 
-# Export the functions that will be used in routes
-save_uploaded_file = table_service.save_uploaded_file
-get_user_tables = table_service.get_user_tables
-delete_table = table_service.delete_table
-get_table_preview = table_service.get_table_preview
-generate_sql_query = table_service.generate_sql_query
+    # Then, update the table name in the database
+    return crud.update_table_name(
+        db=db, table_id=table_id, new_name=validated_new_name, user_id=user_id
+    )
+
+
+def delete_table_file_and_db_entry(
+    db: Session, table_id: int, user_id: int
+) -> crud.Table:
+    # First, get the table to find its file path
+    table_to_delete = (
+        db.query(crud.Table)
+        .filter(crud.Table.id == table_id, crud.Table.user_id == user_id)
+        .first()
+    )
+
+    if not table_to_delete:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Table not found"
+        )
+
+    file_path = table_to_delete.file_path
+
+    # Delete the database entry
+    deleted_table = crud.delete_table(db=db, table_id=table_id, user_id=user_id)
+
+    # If DB deletion was successful, delete the file
+    if deleted_table and file_path and os.path.exists(file_path):
+        os.remove(file_path)
+
+    return deleted_table
+
+
+def get_table_preview(db: Session, table_id: int, user_id: int) -> dict:
+    table = (
+        db.query(crud.Table)
+        .filter(crud.Table.id == table_id, crud.Table.user_id == user_id)
+        .first()
+    )
+    if not table:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Table not found"
+        )
+
+    try:
+        if table.file_path.endswith(".csv"):
+            df = pd.read_csv(table.file_path)
+        elif table.file_path.endswith(".xlsx"):
+            df = pd.read_excel(table.file_path)
+        else:
+            return {"error": "Неподдерживаемый формат файла для предпросмотра."}
+
+        preview = df.head(5).to_dict(orient="records")
+        columns = df.columns.tolist()
+        return {"preview": preview, "columns": columns, "total_rows": len(df)}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка чтения файла таблицы: {e}")

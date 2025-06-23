@@ -1,10 +1,10 @@
 import hashlib
 import os
 from PIL import Image, ImageDraw, ImageFont
+import uuid
 
 # Убедимся, что директория для аватаров существует
 AVATAR_DIR = "uploads/avatars"
-os.makedirs(AVATAR_DIR, exist_ok=True)
 
 
 def get_font(size):
@@ -72,9 +72,13 @@ def generate_avatar(username: str) -> str:
         y = (200 - height) / 2
         draw.text((x, y), letter, fill="white", font=font)
 
-    # 4. Сохранение файла
-    avatar_filename = f"{username}.png"
+    # 4. Сохранение файла с уникальным именем
+    avatar_filename = f"{uuid.uuid4()}.png"
     avatar_path = os.path.join(AVATAR_DIR, avatar_filename)
+
+    # Убедимся, что директория существует прямо перед сохранением
+    os.makedirs(os.path.dirname(avatar_path), exist_ok=True)
+
     image.save(avatar_path)
 
     # Возвращаем URL-путь для доступа через веб
